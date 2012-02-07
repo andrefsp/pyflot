@@ -2,43 +2,51 @@ import re
 import time
 
 import pyflot
+import inspect
 
 from exception import MissingDataException
 from exception import DuplicateLabelException
+from exception import MultipleXAxisException
 
-
-class XField(object):
+class Field(object):
     """
-    This class will represent the `x` of an f(x) function
-    """
-    def __init__(self, field=None, **kwargs):
-        if not field:
-            raise Exception("XField must receive an field argument")
-
-        self.field = field
-
-
-class Variable(object):
+    Generic Field class for graphs
     """
 
-    """
+    def __init__(self, **kwargs):
 
-    options = ('label', 'color', 'lines', 'bars', 'points',
-              'xaxis', 'yaxis', 'clickable', 'hoverable', 'shadowSize')
-
-    def __init__(self, field=None, *args, **kwargs):
-        """
-
-        """
-        if not field:
-            raise Exception("Variable must have a field")
-
-        self.field = field
-
-        for option in self.options:
+        for option in self._options:
             if option in kwargs:
-                setattr(self, option, kwargs[option])
+                setattr(self, option, kwargs.pop(option))
 
+
+class XField(Field):
+    """
+    X Axis Field YField
+    """
+    _options = ()
+    fieldname = '_x'
+
+    def contribute_to_class(self, obj):
+        if getattr(obj, self.fieldname, False):
+            raise MultipleXAxisException
+        setattr(obj, self.fieldname, self)
+
+class YField(Field):
+    """
+    YField as a Image of an X Axis YField
+    """
+    _options = ('label', 'color', 'lines', 'bars', 'points',
+             'xaxis', 'yaxis', 'clickable', 'hoverable', 'shadowSize')
+    fieldname = '_y'
+
+    def contribute_to_class(self, obj):
+        if getattr(obj, self.fieldname, False):
+            previous = getattr(obj, self.fieldname)
+            previous.append(self)
+            setattr(obj, self.fieldname, previous)
+        else:
+            setattr(obj, self.fieldname, [self])
 
 
 class Series(dict):
@@ -73,8 +81,7 @@ class TimeSeries(Series):
         """
         super(TimeSeries, self).__init__(data=data, image=image, *args, **kwargs)
         self['data'] = [(int(time.mktime(ts.timetuple()) * 1000), val) \
-                        for ts, val in data]  # fix data attribute for time 
-
+                        for ts, val in data]  # fix data attribute for time
 
 
 class TimeFlotGraph(pyflot.Flot):
@@ -84,15 +91,13 @@ class TimeFlotGraph(pyflot.Flot):
 
     _options = {'mode' : 'time'}
 
-    data = None    # model to get data from
-    x = ''     # field for the x axis
-    y_axis = ()     # fields for the y axis
-
-
     def get_data(self, *args, **kwargs):
         pass
 
     def add_series(self, series=None):
+        """
+
+        """
         if not series:
             raise Exception("add series receives a serie as argument")
         if series['label'] and \
@@ -106,15 +111,24 @@ class TimeFlotGraph(pyflot.Flot):
 
         """
         super(TimeFlotGraph, self).__init__()
+
         if not self.data:
             self.data = self.get_data(*args, **kwargs)
 
-        vals = dict([(y.field, list()) for y in self.y_axis])
+        for attr_name in dir(self):
+            attr = getattr(self, attr_name)
+            if isinstance(attr, Field):
+                setattr(attr, 'field', attr_name)
+                attr.contribute_to_class(self)
 
-        for sample in self.data:
-            for y in self.y_axis:
-                vals[y.field].append((getattr(sample, self.x.field), getattr(sample, y.field)))
 
-        for y in self.y_axis:
-            self.add_series(TimeSeries(data=vals[y.field], image=y))
+        #vals = dict([(y.field, []) for y in self._y])
+
+        #for sample in self.data:
+        #    for y in self._y:
+        #        vals[y.field].append((getattr(sample, self._x.field), getattr(sample, y.field)))
+
+        #for y in self._y:
+        #    self.add_series(TimeSeries(data=vals[y.field], image=y))
+
 
