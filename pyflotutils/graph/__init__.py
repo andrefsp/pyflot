@@ -1,6 +1,11 @@
 import re
 import time
 
+try:
+    import json
+except ImportError:
+    import simplejson as json
+
 import pyflot
 import inspect
 
@@ -58,7 +63,7 @@ class Series(dict):
                'xaxis', 'yaxis',
                'clickable', 'hoverable', 'shadowSize')
 
-    def __init__(self, data=None, image=None, *args, **kwargs):
+    def __init__(self, data=None, variabel=None, *args, **kwargs):
         """
         """
         super(Series, self).__init__(*args, **kwargs)
@@ -66,20 +71,20 @@ class Series(dict):
             raise MissingDataException
 
         self['data'] = data
-        self['label'] = image.label
+        self['label'] = variabel.label
 
         for option in self.options:
-            if getattr(image, option, False):
-                self[option] = getattr(image, option, False)
+            if getattr(variabel, option, False):
+                self[option] = getattr(variabel, option, False)
 
 
 class TimeSeries(Series):
 
-    def __init__(self, data=None, image=None, *args, **kwargs):
+    def __init__(self, data=None, variabel=None, *args, **kwargs):
         """
             This will fix the data to display
         """
-        super(TimeSeries, self).__init__(data=data, image=image, *args, **kwargs)
+        super(TimeSeries, self).__init__(data=data, variabel=variabel, *args, **kwargs)
         self['data'] = [(int(time.mktime(ts.timetuple()) * 1000), val) \
                         for ts, val in data]  # fix data attribute for time
 
@@ -121,14 +126,18 @@ class TimeFlotGraph(pyflot.Flot):
                 setattr(attr, 'field', attr_name)
                 attr.contribute_to_class(self)
 
+        vals = dict([(y.field, []) for y in self._y])
 
-        #vals = dict([(y.field, []) for y in self._y])
+        for sample in self.data:
+            for y in self._y:
+                vals[y.field].append((getattr(sample, self._x.field), getattr(sample, y.field)))
 
-        #for sample in self.data:
-        #    for y in self._y:
-        #        vals[y.field].append((getattr(sample, self._x.field), getattr(sample, y.field)))
+        for y in self._y:
+            self.add_series(TimeSeries(data=vals[y.field], variabel=y))
 
-        #for y in self._y:
-        #    self.add_series(TimeSeries(data=vals[y.field], image=y))
+    @property
+    def series_json(self):
+        ""
+        return json.dumps(self._series)
 
 

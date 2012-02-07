@@ -71,4 +71,10 @@ class SimpleTest(TestCase):
                                                  [var1, var2])
 
 
+    def test_construct_series(self):
+        ""
+        graph = self.TestFlotTimeGraph()
+        print graph.series_json
+
+
 
