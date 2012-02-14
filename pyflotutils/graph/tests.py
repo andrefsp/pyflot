@@ -133,9 +133,9 @@ class GraphTest(TestCase):
                                 series2=S2(),
                                 series3=s3)
 
-        self.assertEquals(len(my_graph.series), 3)
+        self.assertEquals(len(my_graph._series), 3)
 
-        self.assertTrue(any([serie == S1() for serie in my_graph.series]))
-        self.assertTrue(any([serie == S2() for serie in my_graph.series]))
-        self.assertTrue(any([serie == s3 for serie in my_graph.series]))
+        self.assertTrue(any([serie == S1() for serie in my_graph._series]))
+        self.assertTrue(any([serie == S2() for serie in my_graph._series]))
+        self.assertTrue(any([serie == s3 for serie in my_graph._series]))
 

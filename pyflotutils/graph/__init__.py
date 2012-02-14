@@ -109,27 +109,28 @@ class Graph(object):
     Contains the data object and also the plot options       
     """
 
-    series = []
+    _series = []
     _options = {}
 
     def __init__(self, **kwargs):
         """
 
-        """             
+        """
+        self._series = []
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if isinstance(attr, Series):
-                self.series.append(attr)
+                self._series.append(attr)
 
         for arg in kwargs.values():
             if isinstance(arg, Series):
-                self.series.append(arg)
+                self._series.append(arg)
 
 
     @property
     def json_data(self):
         "returns its json data serialized"
-        return json.dumps([series for series in self.series])
+        return json.dumps([series for series in self._series])
 
 
     @property
