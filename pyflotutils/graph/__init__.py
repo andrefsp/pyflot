@@ -1,4 +1,3 @@
-import re
 import time
 
 try:
@@ -12,132 +11,130 @@ import inspect
 from exception import MissingDataException
 from exception import DuplicateLabelException
 from exception import MultipleXAxisException
+from exception import SeriesInvalidOptionException
 
 class Field(object):
     """
     Generic Field class for graphs
     """
 
+    _options = ()
+    
     def __init__(self, **kwargs):
-
         for option in self._options:
             if option in kwargs:
                 setattr(self, option, kwargs.pop(option))
+   
+    def _set_data(self, attr_name, data):   
+        self.data = [getattr(sample, attr_name) for sample in data]
+        
 
+    def contribute_to_class(self, obj, attr_name, data):
+        if getattr(obj, self.fieldname, False):
+            raise MultipleXAxisException
+        setattr(obj, self.fieldname, self)
+        self._set_data(attr_name, data)
+
+   
 
 class XField(Field):
     """
     X Axis Field YField
     """
-    _options = ()
+
     fieldname = '_x'
 
-    def contribute_to_class(self, obj):
-        if getattr(obj, self.fieldname, False):
-            raise MultipleXAxisException
-        setattr(obj, self.fieldname, self)
 
 class YField(Field):
     """
     YField as a Image of an X Axis YField
     """
-    _options = ('label', 'color', 'lines', 'bars', 'points',
-             'xaxis', 'yaxis', 'clickable', 'hoverable', 'shadowSize')
-    fieldname = '_y'
 
-    def contribute_to_class(self, obj):
-        if getattr(obj, self.fieldname, False):
-            previous = getattr(obj, self.fieldname)
-            previous.append(self)
-            setattr(obj, self.fieldname, previous)
-        else:
-            setattr(obj, self.fieldname, [self])
+    fieldname = '_y'
 
 
 class Series(dict):
     """
         This class represents the actual flot series
     """
-    options = ('color', 'lines',
-               'bars', 'points',
-               'xaxis', 'yaxis',
-               'clickable', 'hoverable', 'shadowSize')
 
-    def __init__(self, data=None, variabel=None, *args, **kwargs):
-        """
-        """
-        super(Series, self).__init__(*args, **kwargs)
-        if not data:
-            raise MissingDataException
-
-        self['data'] = data
-        self['label'] = variabel.label
-
-        for option in self.options:
-            if getattr(variabel, option, False):
-                self[option] = getattr(variabel, option, False)
-
-
-class TimeSeries(Series):
-
-    def __init__(self, data=None, variabel=None, *args, **kwargs):
-        """
-            This will fix the data to display
-        """
-        super(TimeSeries, self).__init__(data=data, variabel=variabel, *args, **kwargs)
-        self['data'] = [(int(time.mktime(ts.timetuple()) * 1000), val) \
-                        for ts, val in data]  # fix data attribute for time
-
-
-class TimeFlotGraph(pyflot.Flot):
-    """
-
-    """
-
-    _options = {'mode' : 'time'}
-
-    def get_data(self, *args, **kwargs):
-        pass
-
-    def add_series(self, series=None):
-        """
-
-        """
-        if not series:
-            raise Exception("add series receives a serie as argument")
-        if series['label'] and \
-            series['label'] in [x.get('label', None) for x in self._series]:
-            raise DuplicateLabelException
-        self._series.append(series)
+    _options = ('label', 
+                'color', 
+                'lines', 
+                'bars', 
+                'points',
+                'xaxis', 
+                'yaxis', 
+                'clickable', 
+                'hoverable', 
+                'shadowSize')
 
 
     def __init__(self, *args, **kwargs):
         """
-
         """
-        super(TimeFlotGraph, self).__init__()
 
-        if not self.data:
-            self.data = self.get_data(*args, **kwargs)
+        if 'data' not in dir(self):
+            try:
+                self.data = kwargs.pop('data')
+            except KeyError:
+                raise MissingDataException
 
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if isinstance(attr, Field):
-                setattr(attr, 'field', attr_name)
-                attr.contribute_to_class(self)
+                attr.contribute_to_class(self, attr_name, self.data)
 
-        vals = dict([(y.field, []) for y in self._y])
+        self['data'] = zip(self._x.data, self._y.data)
 
-        for sample in self.data:
-            for y in self._y:
-                vals[y.field].append((getattr(sample, self._x.field), getattr(sample, y.field)))
+        for option in dir(self.Meta):
+            if option in self._options:
+                self[option] = getattr(self.Meta, option)
 
-        for y in self._y:
-            self.add_series(TimeSeries(data=vals[y.field], variabel=y))
+        super(Series, self).__init__(*args, **kwargs)
+   
+    
+    @property
+    def json_series(self):
+        "serializes a Series object"
+        return json.dumps(self)
+
+
+    class Meta:
+        pass
+
+
+class Graph(object):
+    """
+    Contains the data object and also the plot options       
+    """
+
+    series = []
+    _options = {}
+
+    def __init__(self, **kwargs):
+        """
+
+        """             
+        for attr_name in dir(self):
+            attr = getattr(self, attr_name)
+            if isinstance(attr, Series):
+                self.series.append(attr)
+
+        for arg in kwargs.values():
+            if isinstance(arg, Series):
+                self.series.append(arg)
+
 
     @property
-    def series_json(self):
+    def json_data(self):
+        "returns its json data serialized"
+        return json.dumps([series for series in self.series])
+
+
+    @property
+    def options(self):    
         ""
-        return json.dumps(self._series)
+        return json.dumps(self._options)
 
 

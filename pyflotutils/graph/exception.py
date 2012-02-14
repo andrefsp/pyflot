@@ -1,9 +1,14 @@
-from pyflot import MissingDataException, DuplicateLabelException
 
+class MissingDataException(Exception):
+    ""
+
+class DuplicateLabelException(Exception):
+    ""
 
 class MultipleXAxisException(Exception):
-    """
-    This Exception is mean to be raised when there is multiple XFields
-    in a Graph Object
-    """
+    ""
+
+class SeriesInvalidOptionException(Exception):
+    ""
+
 
