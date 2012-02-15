@@ -73,7 +73,6 @@ class Series(dict):
     def __init__(self, *args, **kwargs):
         """
         """
-
         if 'data' not in dir(self):
             try:
                 self.data = kwargs.pop('data')
@@ -92,13 +91,11 @@ class Series(dict):
                 self[option] = getattr(self.Meta, option)
 
         super(Series, self).__init__(*args, **kwargs)
-   
-    
+       
     @property
     def json_series(self):
         "serializes a Series object"
         return json.dumps(self)
-
 
     class Meta:
         pass
@@ -126,12 +123,10 @@ class Graph(object):
             if isinstance(arg, Series):
                 self._series.append(arg)
 
-
     @property
     def json_data(self):
         "returns its json data serialized"
         return json.dumps([series for series in self._series])
-
 
     @property
     def options(self):    
