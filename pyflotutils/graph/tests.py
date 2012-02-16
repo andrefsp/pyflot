@@ -54,6 +54,18 @@ class S3(graph.Series):
         label = 'series3'
 
 
+
+class FieldTest(TestCase):
+
+
+    def test_receives_data(self):
+        data = [x for x in range(0, 10)]
+        my_field = graph.XField(data=data)
+        self.assertEquals(my_field.data, data)
+
+
+
+
 class SeriesTest(TestCase):
     """
     """
@@ -65,6 +77,7 @@ class SeriesTest(TestCase):
 
         self.assertTrue(isinstance(series._y, graph.YField))
         self.assertTrue(isinstance(series._x, graph.XField))
+
 
     def test_series_has_data(self):
         series = S1()
@@ -84,7 +97,6 @@ class SeriesTest(TestCase):
         self.assertEquals(series['color'], 'red')
 
 
-
     def test_series_receives_data_in_kwargs(self):
         series = S3(data=[SampleObject(x=i, y=(-4*i)) for i in range(0, 10)])
 
@@ -94,6 +106,18 @@ class SeriesTest(TestCase):
         self.assertEquals(series['data'], zip(x_data, y_data))
 
 
+    def test_series_accept_field_objects_in_kwargs(self):
+        x_data = [x for x in range(0, 10)]
+        y_data = [y for y in range(10, 20)]
+
+        x_field = graph.XField(data=x_data)
+        y_field = graph.YField(data=y_data)
+
+        series = graph.Series(xa=x_field, ya=y_field)
+
+        self.assertEquals(series['data'], zip(x_data, y_data))
+        self.assertEquals(series._x, x_field)
+        self.assertEquals(series._y, y_field)
 
 
 class MyGraph(graph.Graph):
@@ -139,3 +163,18 @@ class GraphTest(TestCase):
         self.assertTrue(any([serie == S2() for serie in my_graph._series]))
         self.assertTrue(any([serie == s3 for serie in my_graph._series]))
 
+
+
+    def test_graph_accept_multiple_type_series(self):
+        x_data = [i for i in range(30, 40)]
+        y_data = [i for i in range(40, 50)]
+        x_field = graph.XField(data=x_data)
+        y_field = graph.YField(data=y_data)
+
+        series1 = graph.Series(x=x_field, y=y_field)
+
+        my_graph = MyGraph(s1=series1)
+
+        self.assertTrue(any([serie == series1 for serie in my_graph._series]))
+        self.assertTrue(any([serie == S1() for serie in my_graph._series]))
+        self.assertTrue(any([serie == S2() for serie in my_graph._series]))
