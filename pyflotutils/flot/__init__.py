@@ -5,39 +5,32 @@ try:
 except ImportError:
     import simplejson as json
 
-import pyflot
-import inspect
-
 from exception import MissingDataException
 from exception import DuplicateLabelException
-from exception import MultipleXAxisException
+from exception import MultipleAxisException
 from exception import SeriesInvalidOptionException
+
+
 
 class Field(object):
     """
     Generic Field class for graphs
     """
-
-    _args = ('data',)
     
-    def __init__(self, **kwargs):
-        if len(kwargs) > 0:
-            for arg in kwargs.keys():
-                if arg in self._args:
-                    setattr(self, arg, kwargs.pop(arg))
+    def __init__(self, points=None, **kwargs):
+        if points is not None:
+            self.points = points
    
     def _set_data(self, attr_name, data):   
-        self.data = [getattr(sample, attr_name) for sample in data]
+        self.points = [getattr(sample, attr_name) for sample in data]
         
-
     def contribute_to_class(self, obj, attr_name, data=None):
         if getattr(obj, self.fieldname, False):
-            raise MultipleXAxisException
+            raise MultipleAxisException
         setattr(obj, self.fieldname, self)
         if data:
             self._set_data(attr_name, data)
 
-   
 
 class XField(Field):
     """
@@ -82,7 +75,7 @@ class Series(dict):
                 #raise MissingDataException
                 pass
 
-        # through function definition
+        # through class definition
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if isinstance(attr, Field):
@@ -93,7 +86,7 @@ class Series(dict):
             if isinstance(attr, Field):
                 attr.contribute_to_class(self, name)
 
-        self['data'] = zip(self._x.data, self._y.data)
+        self['data'] = zip(self._x.points, self._y.points)
 
         # set series options
         for option in dir(self.Meta):

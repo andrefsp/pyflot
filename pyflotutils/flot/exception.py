@@ -5,7 +5,7 @@ class MissingDataException(Exception):
 class DuplicateLabelException(Exception):
     ""
 
-class MultipleXAxisException(Exception):
+class MultipleAxisException(Exception):
     ""
 
 class SeriesInvalidOptionException(Exception):

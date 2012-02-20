@@ -3,10 +3,12 @@ try:
 except ImportError:
     import simplejson as json
 
-from django.test import TestCase
+#from django.test import TestCase
+from unittest import TestCase
 
-import graph
-from exception import MultipleXAxisException
+#import graph
+import flot
+from flot.exception import MultipleAxisException
 
 
 class SampleObject(object):
@@ -17,12 +19,12 @@ class SampleObject(object):
             setattr(self, arg, kwargs[arg])
 
 
-class S1(graph.Series):
+class S1(flot.Series):
     """
     Series for function y = x + 3
     """
-    x = graph.XField()
-    y = graph.YField()
+    x = flot.XField()
+    y = flot.YField()
     data = [SampleObject(x=i, y=i+3) for i in range(0, 10)]
 
     class Meta:
@@ -30,12 +32,12 @@ class S1(graph.Series):
         color = 'red'
 
 
-class S2(graph.Series):
+class S2(flot.Series):
     """
     Series for function y = x
     """
-    x = graph.XField()
-    y = graph.YField()
+    x = flot.XField()
+    y = flot.YField()
     data = [SampleObject(x=i, y=i) for i in range(0, 10)]
 
     class Meta:
@@ -43,12 +45,12 @@ class S2(graph.Series):
 
 
 
-class S3(graph.Series):
+class S3(flot.Series):
     """
     Series with no initial data
     """
-    x = graph.XField()
-    y = graph.YField()
+    x = flot.XField()
+    y = flot.YField()
 
     class Meta:
         label = 'series3'
@@ -59,9 +61,9 @@ class FieldTest(TestCase):
 
 
     def test_receives_data(self):
-        data = [x for x in range(0, 10)]
-        my_field = graph.XField(data=data)
-        self.assertEquals(my_field.data, data)
+        points = [x for x in range(0, 10)]
+        my_field = flot.XField(points=points)
+        self.assertEquals(my_field.points, points)
 
 
 
@@ -75,20 +77,20 @@ class SeriesTest(TestCase):
         self.assertEquals(series._x, S1.x)
         self.assertEquals(series._y, S1.y)
 
-        self.assertTrue(isinstance(series._y, graph.YField))
-        self.assertTrue(isinstance(series._x, graph.XField))
+        self.assertTrue(isinstance(series._y, flot.YField))
+        self.assertTrue(isinstance(series._x, flot.XField))
 
 
     def test_series_has_data(self):
         series = S1()
 
-        y_data = [getattr(obj, 'y') for obj in series.data]
-        x_data = [getattr(obj, 'x') for obj in series.data]
+        y_points = [getattr(obj, 'y') for obj in series.data]
+        x_points = [getattr(obj, 'x') for obj in series.data]
 
-        self.assertEquals(series._x.data, x_data)
-        self.assertEquals(series._y.data, y_data)
+        self.assertEquals(series._x.points, x_points)
+        self.assertEquals(series._y.points, y_points)
 
-        self.assertEquals(series['data'], zip(x_data, y_data))
+        self.assertEquals(series['data'], zip(x_points, y_points))
 
 
     def test_checks_meta_attrs(self):
@@ -107,20 +109,20 @@ class SeriesTest(TestCase):
 
 
     def test_series_accept_field_objects_in_kwargs(self):
-        x_data = [x for x in range(0, 10)]
-        y_data = [y for y in range(10, 20)]
+        x_points = [x for x in range(0, 10)]
+        y_points = [y for y in range(10, 20)]
 
-        x_field = graph.XField(data=x_data)
-        y_field = graph.YField(data=y_data)
+        x_field = flot.XField(points=x_points)
+        y_field = flot.YField(points=y_points)
 
-        series = graph.Series(xa=x_field, ya=y_field)
+        series = flot.Series(xa=x_field, ya=y_field)
 
-        self.assertEquals(series['data'], zip(x_data, y_data))
+        self.assertEquals(series['data'], zip(x_points, y_points))
         self.assertEquals(series._x, x_field)
         self.assertEquals(series._y, y_field)
 
 
-class MyGraph(graph.Graph):
+class MyGraph(flot.Graph):
     """
         Graph Object
     """
@@ -141,11 +143,11 @@ class GraphTest(TestCase):
         x_graph_data1, y_graph_data1 = zip(*graph_data_obj[0]['data'])
         x_graph_data2, y_graph_data2 = zip(*graph_data_obj[1]['data'])
 
-        self.assertEquals(list(x_graph_data1), S1()._x.data)
-        self.assertEquals(list(y_graph_data1), S1()._y.data)
+        self.assertEquals(list(x_graph_data1), S1()._x.points)
+        self.assertEquals(list(y_graph_data1), S1()._y.points)
 
-        self.assertEquals(list(x_graph_data2), S2()._x.data)
-        self.assertEquals(list(y_graph_data2), S2()._y.data)
+        self.assertEquals(list(x_graph_data2), S2()._x.points)
+        self.assertEquals(list(y_graph_data2), S2()._y.points)
 
 
     def test_graph_receives_series_through_kwargs(self):
@@ -153,7 +155,7 @@ class GraphTest(TestCase):
         """
         sample_data = [SampleObject(x=i, y=i+10) for i in range(0, 10)]
         s3 = S3(data=sample_data)
-        my_graph = graph.Graph(series1=S1(),
+        my_graph = flot.Graph(series1=S1(),
                                 series2=S2(),
                                 series3=s3)
 
@@ -164,14 +166,13 @@ class GraphTest(TestCase):
         self.assertTrue(any([serie == s3 for serie in my_graph._series]))
 
 
-
     def test_graph_accept_multiple_type_series(self):
-        x_data = [i for i in range(30, 40)]
-        y_data = [i for i in range(40, 50)]
-        x_field = graph.XField(data=x_data)
-        y_field = graph.YField(data=y_data)
+        x_points = [i for i in range(30, 40)]
+        y_points = [i for i in range(40, 50)]
+        x_field = flot.XField(points=x_points)
+        y_field = flot.YField(points=y_points)
 
-        series1 = graph.Series(x=x_field, y=y_field)
+        series1 = flot.Series(x=x_field, y=y_field)
 
         my_graph = MyGraph(s1=series1)
 
