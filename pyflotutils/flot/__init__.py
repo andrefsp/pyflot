@@ -3,7 +3,6 @@ try:
     import json
 except ImportError:
     import simplejson as json
-
 from exception import MultipleAxisException
 
 
@@ -19,9 +18,12 @@ class Variable(object):
 
 
 class XAxis(object):
+    "X Axis Object"
     _var_name = '_x'
 
+
 class YAxis(object):
+    "Y Axis Object"
     _var_name = '_y'
 
 
@@ -51,20 +53,22 @@ class TimeVariable(Variable):
 class XVariable(XAxis, LinearVariable):
     "Linear Variable on X Axis"
 
+
 class YVariable(YAxis, LinearVariable):
     "Linear Variable on Y Axis"
+
 
 class TimeXVariable(XAxis, TimeVariable):
     "Time Variable on X Axis"
 
-class TimeXVariable(YAxis, TimeVariable):
+
+class TimeYVariable(YAxis, TimeVariable):
     "Time Variable on Y Axis"
 
 
 class Series(dict):
-    """
-    This class represents the actual flot series
-    """
+    "This class represents the actual flot series"
+
     _options = ('label',    # meta 
                 'color',    # meta
                 'lines',    # unknown  ****
@@ -83,27 +87,21 @@ class Series(dict):
         if 'data' not in dir(self) and data is not None:
             # if not data is defined in Class def try to get is by args
             self.data = data
-
         # through class definition
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if isinstance(attr, Variable):
                 attr.contribute_to_class(self, attr_name, self.data)
-
         # through kwargs
         for name, attr in kwargs.iteritems():
             if isinstance(attr, Variable):
                 attr.contribute_to_class(self, name)
-
         self['data'] = zip(self._x.points, self._y.points)
-
         # set series options
         for option in dir(self.Meta):
             if option in self._options:
                 self[option] = getattr(self.Meta, option)
-
         super(Series, self).__init__()
-
  
     @property
     def json_series(self):
@@ -123,15 +121,12 @@ class Graph(object):
     _options = {}
 
     def __init__(self, **kwargs):
-        """
-
-        """
+        ""
         self._series = []
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if isinstance(attr, Series):
                 self._series.append(attr)
-
         for arg in kwargs.values():
             if isinstance(arg, Series):
                 self._series.append(arg)
@@ -145,7 +140,6 @@ class Graph(object):
     def options(self):    
         ""
         return json.dumps(self._options)
-
 
     class Meta:
         pass
