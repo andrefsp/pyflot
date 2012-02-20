@@ -3,10 +3,8 @@ try:
 except ImportError:
     import simplejson as json
 
-#from django.test import TestCase
 from unittest import TestCase
 
-#import graph
 import flot
 from flot.exception import MultipleAxisException
 
@@ -23,8 +21,8 @@ class S1(flot.Series):
     """
     Series for function y = x + 3
     """
-    x = flot.XField()
-    y = flot.YField()
+    x = flot.XVariable()
+    y = flot.YVariable()
     data = [SampleObject(x=i, y=i+3) for i in range(0, 10)]
 
     class Meta:
@@ -36,36 +34,33 @@ class S2(flot.Series):
     """
     Series for function y = x
     """
-    x = flot.XField()
-    y = flot.YField()
+    x = flot.XVariable()
+    y = flot.YVariable()
     data = [SampleObject(x=i, y=i) for i in range(0, 10)]
 
     class Meta:
         label = 'series2'
 
 
-
 class S3(flot.Series):
     """
     Series with no initial data
     """
-    x = flot.XField()
-    y = flot.YField()
+    x = flot.XVariable()
+    y = flot.YVariable()
 
     class Meta:
         label = 'series3'
 
 
+class VariableTest(TestCase):
+    """
 
-class FieldTest(TestCase):
-
-
+    """
     def test_receives_data(self):
         points = [x for x in range(0, 10)]
-        my_field = flot.XField(points=points)
+        my_field = flot.XVariable(points=points)
         self.assertEquals(my_field.points, points)
-
-
 
 
 class SeriesTest(TestCase):
@@ -77,8 +72,8 @@ class SeriesTest(TestCase):
         self.assertEquals(series._x, S1.x)
         self.assertEquals(series._y, S1.y)
 
-        self.assertTrue(isinstance(series._y, flot.YField))
-        self.assertTrue(isinstance(series._x, flot.XField))
+        self.assertTrue(isinstance(series._y, flot.YVariable))
+        self.assertTrue(isinstance(series._x, flot.XVariable))
 
 
     def test_series_has_data(self):
@@ -112,8 +107,8 @@ class SeriesTest(TestCase):
         x_points = [x for x in range(0, 10)]
         y_points = [y for y in range(10, 20)]
 
-        x_field = flot.XField(points=x_points)
-        y_field = flot.YField(points=y_points)
+        x_field = flot.XVariable(points=x_points)
+        y_field = flot.YVariable(points=y_points)
 
         series = flot.Series(xa=x_field, ya=y_field)
 
@@ -133,7 +128,6 @@ class MyGraph(flot.Graph):
 class GraphTest(TestCase):
     """
     """
-
     def test_graph_builds_data(self):
         """
         """
@@ -169,8 +163,8 @@ class GraphTest(TestCase):
     def test_graph_accept_multiple_type_series(self):
         x_points = [i for i in range(30, 40)]
         y_points = [i for i in range(40, 50)]
-        x_field = flot.XField(points=x_points)
-        y_field = flot.YField(points=y_points)
+        x_field = flot.XVariable(points=x_points)
+        y_field = flot.YVariable(points=y_points)
 
         series1 = flot.Series(x=x_field, y=y_field)
 

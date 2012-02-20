@@ -11,79 +11,92 @@ from exception import MultipleAxisException
 from exception import SeriesInvalidOptionException
 
 
+class Variable(object):
+    "Genric Variable Object"
 
-class Field(object):
-    """
-    Generic Field class for graphs
-    """
-    
+    def contribute_to_class(self, obj, attr_name, data=None):
+        if getattr(obj, self.var_name, False):
+            raise MultipleAxisException
+        setattr(obj, self.var_name, self)
+        if data:
+            self._set_points(attr_name, data)
+
+
+class XAxis(object):
+    var_name = '_x'
+
+class YAxis(object):
+    var_name = '_y'
+
+
+class LinearVariable(Variable):
+    "Linear Variable Object. No adjustment its done to the points"
     def __init__(self, points=None, **kwargs):
         if points is not None:
             self.points = points
    
-    def _set_data(self, attr_name, data):   
+    def _set_points(self, attr_name, data):   
         self.points = [getattr(sample, attr_name) for sample in data]
-        
-    def contribute_to_class(self, obj, attr_name, data=None):
-        if getattr(obj, self.fieldname, False):
-            raise MultipleAxisException
-        setattr(obj, self.fieldname, self)
-        if data:
-            self._set_data(attr_name, data)
 
 
-class XField(Field):
-    """
-    X Axis Field YField
-    """
+class TimeVariable(Variable):
+    "Time Variable Object. Points content its adjusted" 
+    def __init__(self, points=None, *kwargs):
+        if points is not None:
+            self.points = [int(time.mktime(point.timetuple()) * 1000)\
+                                                    for point in points]
 
-    fieldname = '_x'
+    def _set_points(self, attr_name, data):
+        an = attr_name
+        self.points = [int(time.mktime(getattr(s, an).timetuple()) * 1000)\
+                            for s in data]
 
 
-class YField(Field):
-    """
-    YField as a Image of an X Axis YField
-    """
+class XVariable(XAxis, LinearVariable):
+    "Linear Variable on X Axis"
 
-    fieldname = '_y'
+class YVariable(YAxis, LinearVariable):
+    "Linear Variable on Y Axis"
+
+class TimeXVariable(XAxis, TimeVariable):
+    "Time Variable on X Axis"
+
+class TimeXVariable(YAxis, TimeVariable):
+    "Time Variable on Y Axis"
 
 
 class Series(dict):
     """
-        This class represents the actual flot series
+    This class represents the actual flot series
     """
+    _options = ('label',    # meta 
+                'color',    # meta
+                'lines',    # unknown  ****
+                'bars',     # unknown  ****
+                'points',   # unknown  ****
+                'xaxis',    # meta
+                'yaxis',    # meta
+                'clickable',    # meta
+                'hoverable',    # meta
+                'shadowSize')   # meta
 
-    _options = ('label', 
-                'color', 
-                'lines', 
-                'bars', 
-                'points',
-                'xaxis', 
-                'yaxis', 
-                'clickable', 
-                'hoverable', 
-                'shadowSize')
 
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, data=None, *args, **kwargs):
         """
         """
-        if 'data' not in dir(self):
-            try:
-                self.data = kwargs.pop('data')
-            except KeyError:
-                #raise MissingDataException
-                pass
+        if 'data' not in dir(self) and data is not None:
+            # if not data is defined in Class def try to get is by args
+            self.data = data
 
         # through class definition
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
-            if isinstance(attr, Field):
+            if isinstance(attr, Variable):
                 attr.contribute_to_class(self, attr_name, self.data)
 
         # through kwargs
         for name, attr in kwargs.iteritems():
-            if isinstance(attr, Field):
+            if isinstance(attr, Variable):
                 attr.contribute_to_class(self, name)
 
         self['data'] = zip(self._x.points, self._y.points)
@@ -137,4 +150,7 @@ class Graph(object):
         ""
         return json.dumps(self._options)
 
+
+    class Meta:
+        pass
 
