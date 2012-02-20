@@ -1,32 +1,28 @@
 import time
-
 try:
     import json
 except ImportError:
     import simplejson as json
 
-from exception import MissingDataException
-from exception import DuplicateLabelException
 from exception import MultipleAxisException
-from exception import SeriesInvalidOptionException
 
 
 class Variable(object):
     "Genric Variable Object"
 
     def contribute_to_class(self, obj, attr_name, data=None):
-        if getattr(obj, self.var_name, False):
+        if getattr(obj, self._var_name, False):
             raise MultipleAxisException
-        setattr(obj, self.var_name, self)
+        setattr(obj, self._var_name, self)
         if data:
             self._set_points(attr_name, data)
 
 
 class XAxis(object):
-    var_name = '_x'
+    _var_name = '_x'
 
 class YAxis(object):
-    var_name = '_y'
+    _var_name = '_y'
 
 
 class LinearVariable(Variable):
