@@ -28,39 +28,35 @@ a minute.
 
 1. This first example shows how to print a graph json data.
 
-{{{
-#!rst
-
-.. code-block:: python
+    ::
  
-    import flot
-    
-    class MyObject(object):
-        "A sample object model"
-        def __init__(self, \**kwargs):  
-            for key, val in kwargs.iteritems():
-                setattr(self, key, val)
-    
-    \# let's create a list of objects  
-    my_list = [MyObject(var=i, usr=i+1) for i in range(0, 10)]
-    
-    \# create a Series object
-    class MySeries(flot.Series):
-        var = flot.XVariable()
-        usr = flot.YVariable()
-        data = my_list
-    
-        class Meta:
-            label = 'my series'
-            color = 'red'
-    
-    \# now its time to create our 
-    class MyGraph(flot.Graph):
-        my_series = MySeries()
-    
-    \# instantiate your graph
-    my_graph = MyGraph()
-    \# the data should come out in 
-    print my_graph.json_data 
-}}}
+        import flot
+        
+        class MyObject(object):
+            "A sample object model"
+            def __init__(self, \**kwargs):  
+                for key, val in kwargs.iteritems():
+                    setattr(self, key, val)
+        
+        \# let's create a list of objects  
+        my_list = [MyObject(var=i, usr=i+1) for i in range(0, 10)]
+        
+        \# create a Series object
+        class MySeries(flot.Series):
+            var = flot.XVariable()
+            usr = flot.YVariable()
+            data = my_list
+        
+            class Meta:
+                label = 'my series'
+                color = 'red'
+        
+        \# now its time to create our 
+        class MyGraph(flot.Graph):
+            my_series = MySeries()
+        
+        \# instantiate your graph
+        my_graph = MyGraph()
+        \# the data should come out in 
+        print my_graph.json_data 
 
