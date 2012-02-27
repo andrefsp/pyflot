@@ -1,26 +1,24 @@
+import datetime
+import time
+import unittest
 try:
     import json
 except ImportError:
     import simplejson as json
 
-from unittest import TestCase
-
 import flot
-from flot.exception import MultipleAxisException
+
 
 
 class SampleObject(object):
-    """
-    """
+    ""
     def __init__(self, **kwargs):
         for arg in kwargs:
             setattr(self, arg, kwargs[arg])
 
 
 class S1(flot.Series):
-    """
-    Series for function y = x + 3
-    """
+    "Series for function y = x + 3"
     x = flot.XVariable()
     y = flot.YVariable()
     data = [SampleObject(x=i, y=i+3) for i in range(0, 10)]
@@ -31,9 +29,7 @@ class S1(flot.Series):
 
 
 class S2(flot.Series):
-    """
-    Series for function y = x
-    """
+    "Series for function y = x"
     x = flot.XVariable()
     y = flot.YVariable()
     data = [SampleObject(x=i, y=i) for i in range(0, 10)]
@@ -43,29 +39,41 @@ class S2(flot.Series):
 
 
 class S3(flot.Series):
-    """
-    Series with no initial data
-    """
+    "Series with no initial data"
     x = flot.XVariable()
     y = flot.YVariable()
 
     class Meta:
         label = 'series3'
 
+class S4(flot.Series):
+    "Series with X axis in time"
+    var = flot.TimeXVariable()
+    usr = flot.YVariable()
+    data = [SampleObject(var=datetime.date(2011, 1, i), usr=i+10)\
+                                                for i in range(1, 10)]
 
-class VariableTest(TestCase):
-    """
 
-    """
+class VariableTest(unittest.TestCase):
+    "Variable test class"
     def test_receives_data(self):
         points = [x for x in range(0, 10)]
-        my_field = flot.XVariable(points=points)
-        self.assertEquals(my_field.points, points)
+        my_var = flot.XVariable(points=points)
+        self.assertEquals(my_var.points, points)
 
 
-class SeriesTest(TestCase):
-    """
-    """
+class TimeVariableTest(unittest.TestCase):
+    "TimeVariable test class"
+    def test_corrects_data(self):
+        points = [datetime.date(2012, 1, i) for i in range(1, 10)]
+        my_var = flot.TimeXVariable(points=points)
+        time_points = [int(time.mktime(d.timetuple())*1000) for d in points]
+        self.assertEquals(my_var.points, time_points)
+
+
+
+class SeriesTest(unittest.TestCase):
+    "Series test class"
     def test_series_has_attrs(self):
         series = S1()
 
@@ -118,19 +126,14 @@ class SeriesTest(TestCase):
 
 
 class MyGraph(flot.Graph):
-    """
-        Graph Object
-    """
+    "Graph Object"
     series1 = S1()
     series2 = S2()
 
 
-class GraphTest(TestCase):
-    """
-    """
+class GraphTest(unittest.TestCase):
+    "Graph test class"
     def test_graph_builds_data(self):
-        """
-        """
         my_graph = MyGraph()
         graph_data_obj = json.loads(my_graph.json_data)
 
@@ -145,8 +148,6 @@ class GraphTest(TestCase):
 
 
     def test_graph_receives_series_through_kwargs(self):
-        """
-        """
         sample_data = [SampleObject(x=i, y=i+10) for i in range(0, 10)]
         s3 = S3(data=sample_data)
         my_graph = flot.Graph(series1=S1(),
@@ -165,11 +166,15 @@ class GraphTest(TestCase):
         y_points = [i for i in range(40, 50)]
         x_field = flot.XVariable(points=x_points)
         y_field = flot.YVariable(points=y_points)
-
         series1 = flot.Series(x=x_field, y=y_field)
-
         my_graph = MyGraph(s1=series1)
-
         self.assertTrue(any([serie == series1 for serie in my_graph._series]))
         self.assertTrue(any([serie == S1() for serie in my_graph._series]))
         self.assertTrue(any([serie == S2() for serie in my_graph._series]))
+
+    def test_graph_set_axis_mode(self):
+        my_graph = flot.Graph(series1=S4())
+        self.assertEquals(my_graph._options['xaxis']['mode'], 'time')
+        self.assertEquals(my_graph._options['yaxis']['mode'], 'null')
+
+

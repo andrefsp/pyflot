@@ -3,7 +3,8 @@ try:
     import json
 except ImportError:
     import simplejson as json
-from exception import MultipleAxisException
+
+import exception
 
 
 class Variable(object):
@@ -11,18 +12,27 @@ class Variable(object):
 
     def contribute_to_class(self, obj, attr_name, data=None):
         if getattr(obj, self._var_name, False):
-            raise MultipleAxisException
+            raise exception.MultipleAxisException
         setattr(obj, self._var_name, self)
         if data:
             self._set_points(attr_name, data)
 
 
-class XAxis(object):
+class Axis(object):
+    ""
+    def __repr__(self):
+        return self._var_name
+
+    def __str__(self):
+        return self._var_name
+
+
+class XAxis(Axis):
     "X Axis Object"
     _var_name = '_x'
 
 
-class YAxis(object):
+class YAxis(Axis):
     "Y Axis Object"
     _var_name = '_y'
 
@@ -32,13 +42,13 @@ class LinearVariable(Variable):
     def __init__(self, points=None, **kwargs):
         if points is not None:
             self.points = points
-   
-    def _set_points(self, attr_name, data):   
+
+    def _set_points(self, attr_name, data):
         self.points = [getattr(sample, attr_name) for sample in data]
 
 
 class TimeVariable(Variable):
-    "Time Variable Object. Points content its adjusted" 
+    "Time Variable Object. Points content its adjusted"
     def __init__(self, points=None, *kwargs):
         if points is not None:
             self.points = [int(time.mktime(point.timetuple()) * 1000)\
@@ -47,7 +57,7 @@ class TimeVariable(Variable):
     def _set_points(self, attr_name, data):
         an = attr_name
         self.points = [int(time.mktime(getattr(s, an).timetuple()) * 1000)\
-                            for s in data]
+                                                    for s in data]
 
 
 class XVariable(XAxis, LinearVariable):
@@ -69,17 +79,13 @@ class TimeYVariable(YAxis, TimeVariable):
 class Series(dict):
     "This class represents the actual flot series"
 
-    _options = ('label',    # meta 
+    _options = ('label',    # meta
                 'color',    # meta
-                'lines',    # unknown  ****
-                'bars',     # unknown  ****
-                'points',   # unknown  ****
-                'xaxis',    # meta
-                'yaxis',    # meta
-                'clickable',    # meta
-                'hoverable',    # meta
-                'shadowSize')   # meta
-
+                'xaxis',    # 0/1 meta
+                'yaxis',    # 0/1 meta
+                'clickable',    # 0/1 meta
+                'hoverable',    # 0/1 meta
+                'shadowSize')   # 0/1 meta
 
     def __init__(self, data=None, *args, **kwargs):
         """
@@ -102,7 +108,7 @@ class Series(dict):
             if option in self._options:
                 self[option] = getattr(self.Meta, option)
         super(Series, self).__init__()
- 
+
     @property
     def json_series(self):
         "serializes a Series object"
@@ -113,12 +119,13 @@ class Series(dict):
 
 
 class Graph(object):
-    """
-    Contains the data object and also the plot options       
-    """
+    "Contains the data object and also the plot options"
 
     _series = []
-    _options = {}
+    _options = {
+        'xaxis' : {},
+        'yaxis' : {},
+    }
 
     def __init__(self, **kwargs):
         ""
@@ -131,13 +138,29 @@ class Graph(object):
             if isinstance(arg, Series):
                 self._series.append(arg)
 
+        self._set_options()
+
+
+    def _get_axis_mode(self, axis):
+        "will get the axis mode for the current series"
+        if all([isinstance(getattr(s, axis), TimeVariable) for s in self._series]):
+            return 'time'
+        return 'null'
+
+    def _set_options(self):
+        "sets the graph ploting options"
+        self._options = {
+            'xaxis' : {'mode' : self._get_axis_mode(XAxis._var_name)},
+            'yaxis' : {'mode' : self._get_axis_mode(YAxis._var_name)},
+        }
+
     @property
     def json_data(self):
         "returns its json data serialized"
-        return json.dumps([series for series in self._series])
+        return json.dumps(self._series)
 
     @property
-    def options(self):    
+    def options(self):
         ""
         return json.dumps(self._options)
 
