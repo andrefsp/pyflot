@@ -1,0 +1,12 @@
+<html>
+    <head>
+        <script type="text/javascript" src='js/jquery.js'></script>
+        <script type="text/javascript" src='js/jquery.flot.js'></script>
+    </head>
+    <body>
+        <div id="placeholder" style="width:600px;height:300px;"></div>
+        <script type='text/javascript'>
+            $.plot($("#placeholder"), {{ graph.json_data|safe }}, {{ graph.options|safe }});
+        </script>
+    </body>
+</html>
