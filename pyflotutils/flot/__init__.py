@@ -6,6 +6,35 @@ except ImportError:
 
 import exception
 
+class BaseOptions(dict):
+    """
+    Base implementation for options
+    """
+    # Legend, xaxis, yaxis
+
+    allowed_options = {}
+
+    def __setitem__(self, key, value):
+        if key not in self.allowed_options.keys():
+            raise TypeError("Not allowed option received")
+        if not isinstance(value, self.allowed_options[key]):
+            raise TypeError("Option %s got an unexpected object type" % key)
+        super(BaseOptions, self).__setitem__(key, value)
+
+    def __init__(self, *args, **kwargs):
+        super(BaseOptions, self).__init__()
+        for option, value in kwargs.items():
+            self[option] = value
+
+class GraphOptions(BaseOptions):
+    "Option object for graph"
+
+    allowed_options = {
+                        'xaxis': dict,
+                        'yaxis': dict,
+                        'legend': dict,
+                        'grid': list,
+                      }
 
 class Variable(object):
     "Genric Variable Object"
@@ -19,7 +48,8 @@ class Variable(object):
 
 
 class Axis(object):
-    ""
+    "Generic Axis object"
+
     def __repr__(self):
         return self._var_name
 
@@ -49,7 +79,7 @@ class LinearVariable(Variable):
 
 class TimeVariable(Variable):
     "Time Variable Object. Points content its adjusted"
-    def __init__(self, points=None, *kwargs):
+    def __init__(self, points=None, **kwargs):
         if points is not None:
             self.points = [int(time.mktime(point.timetuple()) * 1000)\
                                                     for point in points]
@@ -120,15 +150,16 @@ class Series(dict):
 
 class Graph(object):
     "Contains the data object and also the plot options"
+    #TODO should receive a Legend object as argument
 
     _series = []
-    _options = {
-        'xaxis' : {},
-        'yaxis' : {},
-    }
+    _options = GraphOptions(xaxis={},
+                            yaxis={},
+                            legend={},
+                            grid=[])
 
     def __init__(self, **kwargs):
-        ""
+        "This contructor will be able to receive"
         self._series = []
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
@@ -137,9 +168,10 @@ class Graph(object):
         for arg in kwargs.values():
             if isinstance(arg, Series):
                 self._series.append(arg)
-
+            if isinstance(arg, GraphOptions):
+                self._options.update(arg)
+        # should be able to get a Options Object
         self._set_options()
-
 
     def _get_axis_mode(self, axis):
         "will get the axis mode for the current series"
@@ -149,10 +181,10 @@ class Graph(object):
 
     def _set_options(self):
         "sets the graph ploting options"
-        self._options = {
-            'xaxis' : {'mode' : self._get_axis_mode(XAxis._var_name)},
-            'yaxis' : {'mode' : self._get_axis_mode(YAxis._var_name)},
-        }
+        self._options['xaxis'].update(
+                        {'mode' : self._get_axis_mode(XAxis._var_name)})
+        self._options['yaxis'].update(
+                        {'mode' : self._get_axis_mode(YAxis._var_name)})
 
     @property
     def json_data(self):
@@ -163,7 +195,4 @@ class Graph(object):
     def options(self):
         ""
         return json.dumps(self._options)
-
-    class Meta:
-        pass
 

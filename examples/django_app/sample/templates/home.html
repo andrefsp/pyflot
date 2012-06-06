@@ -9,5 +9,12 @@
         <script type='text/javascript'>
             $.plot($("#graph1"), {{ graph1.json_data|safe }}, {{ graph1.options|safe }});
         </script>
+        <hr/>
+        <div id="graph2" style="width:300px;height:200px;"></div>
+        <script type='text/javascript'>
+            $.plot($("#graph2"), {{ graph2.json_data|safe }}, {{ graph2.options|safe }});
+        </script>
+
+
     </body>
 </html>
