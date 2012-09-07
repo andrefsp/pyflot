@@ -17,8 +17,9 @@ class HomeView(TemplateView):
         time1 = flot.Series(x=flot.TimeXVariable(points=x_time_points),
                             y=flot.YVariable(points=y_points))
 
+        graph_option = flot.GraphOptions(xaxis={'format': '%d/%m/%Y'})
         context = {
                     'graph1': flot.Graph(series1=xy10, series2=xy20),
-                    'graph2': flot.Graph(series1=time1),
+                    'graph2': flot.Graph(series1=time1, options=graph_option),
                 }
         return context

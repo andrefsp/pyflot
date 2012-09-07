@@ -7,9 +7,7 @@ except ImportError:
 import exception
 
 class BaseOptions(dict):
-    """
-    Base implementation for options
-    """
+    "Base implementation for options"
     # Legend, xaxis, yaxis
 
     allowed_options = {}
@@ -24,7 +22,8 @@ class BaseOptions(dict):
     def __init__(self, *args, **kwargs):
         super(BaseOptions, self).__init__()
         for option, value in kwargs.items():
-            self[option] = value
+            if value:
+                self[option] = value
 
 class GraphOptions(BaseOptions):
     "Option object for graph"
@@ -156,7 +155,8 @@ class Graph(object):
     _options = GraphOptions(xaxis={},
                             yaxis={},
                             legend={},
-                            grid=[])
+                            grid=[]
+                            )
 
     def __init__(self, **kwargs):
         "This contructor will be able to receive"
@@ -181,9 +181,13 @@ class Graph(object):
 
     def _set_options(self):
         "sets the graph ploting options"
-        self._options['xaxis'].update(
+        # this is aweful
+        # TODO: Axis options should be passed completly by a GraphOption
+        if 'xaxis' in self._options.keys():
+            self._options['xaxis'].update(
                         {'mode' : self._get_axis_mode(XAxis._var_name)})
-        self._options['yaxis'].update(
+        if 'yaxis' in self._options.keys():
+            self._options['yaxis'].update(
                         {'mode' : self._get_axis_mode(YAxis._var_name)})
 
     @property

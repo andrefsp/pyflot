@@ -1,3 +1,4 @@
+{% load flot_tags %}
 <html>
     <head>
         <script type="text/javascript" src='static/js/jquery.js'></script>
@@ -5,6 +6,7 @@
     </head>
     <body>
         <h1>pyFlot examples</h1>
+        <!-- Graphs ploted accessing the graph object -->
         <div id="graph1" style="width:300px;height:200px;"></div>
         <script type='text/javascript'>
             $.plot($("#graph1"), {{ graph1.json_data|safe }}, {{ graph1.options|safe }});
@@ -15,6 +17,10 @@
             $.plot($("#graph2"), {{ graph2.json_data|safe }}, {{ graph2.options|safe }});
         </script>
 
-
+        <!-- graphs plotted with template tag -->
+        <hr/>
+        {% plot gr1 graph1 style="width:300px;height:200px" class="myclass" %} 
+        <hr/>
+        {% plot gr2 graph2 style="width:300px;height:200px" %} 
     </body>
 </html>
