@@ -136,6 +136,11 @@ class SeriesTest(unittest.TestCase):
         self.assertEquals(series._x, x_field)
         self.assertEquals(series._y, y_field)
 
+    def test_options_van_be_passed_to_seties(self):
+        series = S1(options=flot.SeriesOptions(bars={'show': True}))
+        self.assertTrue('show' in series['bars'])
+        self.assertTrue(series['bars']['show'])
+
 
 class MyGraph(flot.Graph):
     "Graph Object"

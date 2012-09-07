@@ -13,10 +13,12 @@ class BaseOptions(dict):
     allowed_options = {}
 
     def __setitem__(self, key, value):
-        if key not in self.allowed_options.keys():
-            raise TypeError("Not allowed option received")
-        if not isinstance(value, self.allowed_options[key]):
-            raise TypeError("Option %s got an unexpected object type" % key)
+        if not key.startswith('__'):
+            if key not in self.allowed_options.keys():
+                raise TypeError("%s is not a allowed option. Allowed "
+                        "options are: %s" % (key, self.allowed_options.keys()))
+            if not isinstance(value, self.allowed_options[key]):
+                raise TypeError("Option %s got an unexpected object type" % key)
         super(BaseOptions, self).__setitem__(key, value)
 
     def __init__(self, *args, **kwargs):
@@ -34,6 +36,23 @@ class GraphOptions(BaseOptions):
                         'legend': dict,
                         'grid': list,
                       }
+
+class SeriesOptions(BaseOptions):
+    """
+        Options for Series object. This should be a completition of the
+    normal json_data object
+    """
+
+    allowed_options  = {
+            'label': basestring,    
+            'color': basestring,    
+            'xaxis': list,    
+            'yaxis': list, 
+            'lines': dict,
+            'bars': dict,
+            'points': dict,
+    }
+
 
 class Variable(object):
     "Genric Variable Object"
@@ -108,16 +127,12 @@ class TimeYVariable(YAxis, TimeVariable):
 class Series(dict):
     "This class represents the actual flot series"
 
-    _options = ('label',    # meta
-                'color',    # meta
-                'xaxis',    # 0/1 meta
-                'yaxis',    # 0/1 meta
-                'clickable',    # 0/1 meta
-                'hoverable',    # 0/1 meta
-                'shadowSize')   # 0/1 meta
+    _options = SeriesOptions()
 
-    def __init__(self, data=None, *args, **kwargs):
+    def __init__(self, data=None, options=None, *args, **kwargs):
         """
+        Series should be able to get contructed and completed through
+        class definition or through kwargs
         """
         if 'data' not in dir(self) and data is not None:
             # if not data is defined in Class def try to get is by args
@@ -133,10 +148,13 @@ class Series(dict):
                 attr.contribute_to_class(self, name)
         self['data'] = zip(self._x.points, self._y.points)
         # set series options
-        for option in dir(self.Meta):
-            if option in self._options:
-                self[option] = getattr(self.Meta, option)
         super(Series, self).__init__()
+        for option in dir(self.Meta):
+            self._options[option] = getattr(self.Meta, option)
+        self.update(self._options)
+        # options passed to the construction will overide Meta options
+        if options is not None and isinstance(options, SeriesOptions):
+            self.update(options)
 
     @property
     def json_series(self):
