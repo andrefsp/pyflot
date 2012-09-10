@@ -60,16 +60,18 @@ class S4(flot.Series):
 
 
 class OptionsTest(unittest.TestCase):
-    ""
+    "Test for the option global Option class"
 
     def test_options_check_for_allowed_options(self):
         # this object only allows
         options = flot.GraphOptions()
-        with self.assertRaises(TypeError):
-            options['x'] = 123
-        with self.assertRaises(TypeError):
-            options['xaxis'] = [1,2,3]
-
+        key_val_list = [('x', 123), ('xaxis', [1,2,3])]
+        for key, val in key_val_list:
+            try:
+                options[key] = val 
+            except TypeError:
+                # its fine
+                pass
         options['xaxis'] = { 'format': '%d-%m-%y', 'mode': 'time' }
 
     def test_options_can_be_passed_through_constructor(self):
