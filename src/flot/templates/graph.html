@@ -1,0 +1,6 @@
+{% autoescape off %}
+<div id="{{ dom_id }}" %(rest)s></div>
+<script type='text/javascript'>
+     $.plot($("#{{ dom_id }}"), {{ graph.json_data }}, {{ graph.options }});
+</script>
+{% endautoescape %}

@@ -1,4 +1,6 @@
 from django import template
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -20,7 +22,7 @@ class GraphRenderer(template.Node):
             'graph_options': graph.options
         }
         return """
-       <div id="%(dom_id)s" %(rest)s></div>
+        <div id="%(dom_id)s" %(rest)s></div>
         <script type='text/javascript'>
             $.plot($("#%(dom_id)s"), %(graph_data)s, %(graph_options)s);
         </script>
