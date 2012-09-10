@@ -1,8 +1,8 @@
 import time
 try:
-    import json
-except ImportError:
     import simplejson as json
+except ImportError:
+    import json
 
 import exception
 
@@ -27,6 +27,7 @@ class BaseOptions(dict):
             if value:
                 self[option] = value
 
+
 class GraphOptions(BaseOptions):
     "Option object for graph"
 
@@ -35,7 +36,8 @@ class GraphOptions(BaseOptions):
                         'yaxis': dict,
                         'legend': dict,
                         'grid': list,
-                      }
+    }
+
 
 class SeriesOptions(BaseOptions):
     """
@@ -44,10 +46,10 @@ class SeriesOptions(BaseOptions):
     """
 
     allowed_options  = {
-            'label': basestring,    
-            'color': basestring,    
-            'xaxis': list,    
-            'yaxis': list, 
+            'label': basestring,
+            'color': basestring,
+            'xaxis': list,
+            'yaxis': list,
             'lines': dict,
             'bars': dict,
             'points': dict,
@@ -215,6 +217,6 @@ class Graph(object):
 
     @property
     def options(self):
-        ""
+        "returns its json option serialized"
         return json.dumps(self._options)
 
