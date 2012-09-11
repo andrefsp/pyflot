@@ -150,7 +150,7 @@ class MyGraph(flot.Graph):
     series2 = S2()
 
     class Meta:
-        options = flot.GraphOptions()
+        grid = { 'clickable': True}
 
 
 class GraphTest(unittest.TestCase):
@@ -191,14 +191,20 @@ class GraphTest(unittest.TestCase):
     def test_graph_set_axis_mode(self):
         my_graph = flot.Graph(series1=S4())
         self.assertEquals(my_graph._options['xaxis']['mode'], 'time')
-        #self.assertEquals(my_graph._options['yaxis']['mode'], 'null')
+
+    def test_graph_get_options_on_Meta(self):
+        my_graph = MyGraph()
+        self.assertTrue('grid' in my_graph._options.keys())
+        self.assertTrue(my_graph._options['grid']['clickable'])
 
     def test_graph_accepts_options(self):
         my_graph = flot.Graph(series1=S4(), options=flot.GraphOptions(xaxis={
                                                 'mode': 'time',
-                                                'format': '%d-%m-%y' 
+                                                'format': '%d-%m-%y'
                                                 }))
         self.assertEquals(my_graph._options['xaxis']['mode'], 'time')
         self.assertEquals(my_graph._options['xaxis']['format'], '%d-%m-%y')
+
+
 
 

@@ -35,7 +35,7 @@ class GraphOptions(BaseOptions):
                         'xaxis': dict,
                         'yaxis': dict,
                         'legend': dict,
-                        'grid': list,
+                        'grid': dict,
     }
 
 
@@ -53,6 +53,10 @@ class SeriesOptions(BaseOptions):
             'lines': dict,
             'bars': dict,
             'points': dict,
+            'clickable': bool,
+            'hoverable': bool,
+            'shadowSize': int,
+            'highlightColor': basestring,
     }
 
 
@@ -169,18 +173,18 @@ class Series(dict):
 
 class Graph(object):
     "Contains the data object and also the plot options"
-    #TODO should receive a Legend object as argument
 
     _series = []
     _options = GraphOptions(xaxis={},
                             yaxis={},
                             legend={},
                             grid=[]
-                            )
+    )
 
-    def __init__(self, **kwargs):
+    def __init__(self, options=None, **kwargs):
         "This contructor will be able to receive"
         self._series = []
+        # set series
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
             if isinstance(attr, Series):
@@ -188,16 +192,19 @@ class Graph(object):
         for arg in kwargs.values():
             if isinstance(arg, Series):
                 self._series.append(arg)
-            if isinstance(arg, GraphOptions):
-                self._options.update(arg)
-        # should be able to get a Options Object
+        # set options through Meta
+        for option in dir(self.Meta):
+            self._options[option] = getattr(self.Meta, option)
+        # check for options through argument
+        if options and isinstance(options, GraphOptions):
+            self._options.update(options)
         self._set_options()
 
     def _get_axis_mode(self, axis):
         "will get the axis mode for the current series"
         if all([isinstance(getattr(s, axis), TimeVariable) for s in self._series]):
             return 'time'
-        return 'null'
+        return None
 
     def _set_options(self):
         "sets the graph ploting options"
@@ -219,4 +226,8 @@ class Graph(object):
     def options(self):
         "returns its json option serialized"
         return json.dumps(self._options)
+
+    class Meta:
+        # meta should contain graph options, eg. xaxis, yaxis, legend
+        pass
 
