@@ -8,11 +8,14 @@ import exception
 
 class BaseOptions(dict):
     "Base implementation for options"
-    # Legend, xaxis, yaxis
 
     allowed_options = {}
 
     def __setitem__(self, key, value):
+        """
+        __setitem__ should only allow keys within allowed option keys
+        and they have to batch the type
+        """
         if not key.startswith('__'):
             if key not in self.allowed_options.keys():
                 raise TypeError("%s is not a allowed option. Allowed "
@@ -175,11 +178,7 @@ class Graph(object):
     "Contains the data object and also the plot options"
 
     _series = []
-    _options = GraphOptions(xaxis={},
-                            yaxis={},
-                            legend={},
-                            grid=[]
-    )
+    _options = GraphOptions()
 
     def __init__(self, options=None, **kwargs):
         "This contructor will be able to receive"
