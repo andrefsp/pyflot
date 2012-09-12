@@ -244,6 +244,9 @@ class GraphTest(unittest.TestCase):
         self.assertEquals(my_graph._options['xaxis']['mode'], 'time')
         self.assertEquals(my_graph._options['xaxis']['format'], '%d-%m-%y')
 
-
-
+    def test_graph_accepts_series_by_args(self):
+        series1 = S1()
+        series2 = S2()
+        my_graph = flot.Graph([series1, series2])
+        self.assertEquals(len(my_graph._series), 2)
 

@@ -237,7 +237,7 @@ class Graph(object):
     _series = []
     _options = GraphOptions()
 
-    def __init__(self, options=None, **kwargs):
+    def __init__(self, series=None, options=None, **kwargs):
         "This contructor will be able to receive"
         self._series = []
         # set series
@@ -248,6 +248,10 @@ class Graph(object):
         for arg in kwargs.values():
             if isinstance(arg, Series):
                 self._series.append(arg)
+        
+        if series and all([isinstance(s, Series) for s in series]):
+            self._series.extend(series)
+
         # set options through Meta
         for option in dir(self.Meta):
             self._options[option] = getattr(self.Meta, option)

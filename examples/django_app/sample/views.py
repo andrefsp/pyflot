@@ -31,14 +31,15 @@ class HomeView(TemplateView):
 
         xpoints = map(math.radians ,range(1, 360))
         ypoints = map(math.sin, xpoints)
-        sin_series = flot.Series(
-                            data=zip(xpoints, ypoints),
+        sin_series = flot.Series(data=zip(xpoints, ypoints),
                             options=flot.SeriesOptions(label='sin(x)',
                                                        color='red'))
 
+        last_series = flot.Series(xpoints=range(0, 10), ypoints=range(0, 10))
         context = {
                     'graph1': flot.Graph(series1=xy10, series2=xy20),
                     'graph2': flot.Graph(series1=time1, options=graph_option),
-                    'sin_graph': flot.Graph(sin_series=sin_series)
+                    'sin_graph': flot.Graph(sin_series=sin_series),
+                    'last_series': flot.Graph(last_series=last_series)
                 }
         return context
