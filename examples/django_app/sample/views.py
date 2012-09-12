@@ -1,4 +1,5 @@
 import flot
+import math
 import datetime
 from django.views.generic import TemplateView
 
@@ -27,8 +28,17 @@ class HomeView(TemplateView):
                                                         color='blue'))
 
         graph_option = flot.GraphOptions(xaxis={'format': '%d/%m/%Y'})
+
+        xpoints = map(math.radians ,range(1, 360))
+        ypoints = map(math.sin, xpoints)
+        sin_series = flot.Series(
+                            data=zip(xpoints, ypoints),
+                            options=flot.SeriesOptions(label='sin(x)',
+                                                       color='red'))
+
         context = {
                     'graph1': flot.Graph(series1=xy10, series2=xy20),
                     'graph2': flot.Graph(series1=time1, options=graph_option),
+                    'sin_graph': flot.Graph(sin_series=sin_series)
                 }
         return context

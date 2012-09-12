@@ -163,6 +163,25 @@ class SeriesTest(unittest.TestCase):
         self.assertTrue('show' in series['bars'])
         self.assertTrue(series['bars']['show'])
 
+    def test_series_accepts_direct_data(self):
+        xpoints = [1,2,3]
+        ypoints = [4,5,6]
+        series_data = zip(xpoints, ypoints)
+        test_series = flot.Series(data=series_data)
+        self.assertTrue(hasattr(test_series, '_x'))
+        self.assertTrue(test_series._x.points, xpoints)
+        self.assertTrue(hasattr(test_series, '_y'))
+        self.assertTrue(test_series._y.points, ypoints)
+
+    def test_series_accepts_direct_xpoints_and_ypoints(self):
+        xpoints = [1,2,3]
+        ypoints = [4,5,6]
+        test_series = flot.Series(xpoints=xpoints, ypoints=ypoints)
+        self.assertTrue(hasattr(test_series, '_x'))
+        self.assertTrue(test_series._x.points, xpoints)
+        self.assertTrue(hasattr(test_series, '_y'))
+        self.assertTrue(test_series._y.points, ypoints)
+
 
 class MyGraph(flot.Graph):
     "Graph Object"

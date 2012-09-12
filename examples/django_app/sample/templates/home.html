@@ -11,16 +11,12 @@
         <script type='text/javascript'>
             $.plot($("#graph1"), {{ graph1.json_data|safe }}, {{ graph1.options|safe }});
         </script>
-        <hr/>
-        <div id="graph2" style="width:300px;height:200px;"></div>
-        <script type='text/javascript'>
-            $.plot($("#graph2"), {{ graph2.json_data|safe }}, {{ graph2.options|safe }});
-        </script>
-
         <!-- graphs plotted with template tag -->
         <hr/>
-        {% plot gr1 graph1 style="width:300px;height:200px" class="myclass" %} 
+        {% plot gr1 graph1 style="width:900px;height:200px" class="myclass" %} 
         <hr/>
-        {% plot gr2 graph2 style="width:300px;height:200px" %} 
+        {% plot gr2 graph2 style="width:900px;height:200px" %} 
+        </hr>
+        {% plot sin sin_graph  style="width:900px;height:200px" %}
     </body>
 </html>

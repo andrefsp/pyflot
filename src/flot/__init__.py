@@ -109,7 +109,14 @@ class LinearVariable(Variable):
             self.points = points
 
     def _set_points(self, attr_name, data):
-        self.points = [getattr(sample, attr_name) for sample in data]
+        self.points = []
+        for sample in data:
+            try:
+                self.points.append(getattr(sample, attr_name))
+            except AttributeError:
+                s = {}
+                s['_x'], s['_y'] = sample
+                self.points.append(s[self._var_name])
 
 
 class TimeVariable(Variable):
@@ -123,6 +130,18 @@ class TimeVariable(Variable):
         an = attr_name
         self.points = [int(time.mktime(getattr(s, an).timetuple()) * 1000)\
                                                     for s in data]
+        self.points = []
+        for sample in data:
+            try:
+                self.points.append(
+                    int(time.mktime(getattr(sample, an).timetuple()) * 1000)
+                )
+            except AttributeError:
+                s = {}
+                s['_x'], s['_y'] = sample
+                self.points.append(
+                    int(time.mktime(s[self._var_name].timetuple()) * 1000)
+                )
 
 
 class XVariable(XAxis, LinearVariable):
@@ -150,17 +169,23 @@ class Series(dict):
         """
         This method will be called to set Series data
         """
-        for axis in ('_x', '_y'):
-            axis_obj = getattr(self, axis, False)
-            if not axis_obj:
-                raise exception.MissingAxisException("%s missing" % axis)
-            if not getattr(axis_obj, 'points', False):
-                raise exception.MissingDataException()
+        if getattr(self, 'data', False) and not getattr(self, '_x', False) and not getattr(self, '_y', False):
+            _x = XVariable()
+            _y = YVariable()
+            _x.contribute_to_class(self, 'X', self.data)
+            _y.contribute_to_class(self, 'Y', self.data)
+            self['data'] = zip(self._x.points, self._y.points)
+        else: 
+            for axis in ('_x', '_y'):
+                axis_obj = getattr(self, axis, False)
+                if not axis_obj:
+                    raise exception.MissingAxisException("%s missing" % axis)
+                if not getattr(axis_obj, 'points', False):
+                    raise exception.MissingDataException()
 
-        self['data'] = zip(self._x.points, self._y.points)
+            self['data'] = zip(self._x.points, self._y.points)
 
-
-    def __init__(self, data=None, options=None, *args, **kwargs):
+    def __init__(self, data=None, xpoints=None, ypoints=None, options=None, *args, **kwargs):
         """
         Series should be able to get contructed and completed through
         class definition or through kwargs
@@ -171,6 +196,10 @@ class Series(dict):
         if 'data' not in dir(self) and data is not None:
             # if not data is defined in Class def try to get is by args
             self.data = data
+        if data is None and xpoints is not None and ypoints is not None:
+            # xpoints and ypoints were passed directly to Series object
+            self.data = zip(xpoints, ypoints)
+
         # through class definition
         for attr_name in dir(self):
             attr = getattr(self, attr_name)
