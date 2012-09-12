@@ -190,6 +190,9 @@ class Series(dict):
         Series should be able to get contructed and completed through
         class definition or through kwargs
         """
+        #FIXME
+        #   There should be a sanitizing method to take care of data, xpoints
+        # and ypoints args. 
         self._options = SeriesOptions()
         super(Series, self).__init__()
 
@@ -269,7 +272,7 @@ class Graph(object):
     def _set_options(self):
         "sets the graph ploting options"
         # this is aweful
-        # TODO: Axis options should be passed completly by a GraphOption
+        # FIXME: Axis options should be passed completly by a GraphOption
         if 'xaxis' in self._options.keys():
             self._options['xaxis'].update(
                         {'mode' : self._get_axis_mode(XAxis._var_name)})

@@ -35,11 +35,14 @@ class HomeView(TemplateView):
                             options=flot.SeriesOptions(label='sin(x)',
                                                        color='red'))
 
-        last_series = flot.Series(xpoints=range(0, 10), ypoints=range(0, 10))
+        last_series = flot.Series(xpoints=range(0, 10), ypoints=range(0, 10),
+                                    options=flot.SeriesOptions(label='y = x'))
+
         context = {
                     'graph1': flot.Graph(series1=xy10, series2=xy20),
                     'graph2': flot.Graph(series1=time1, options=graph_option),
                     'sin_graph': flot.Graph(sin_series=sin_series),
-                    'last_series': flot.Graph(last_series=last_series)
+                    'last_series': flot.Graph(last_series=last_series),
+                    'all_series_graph': flot.Graph([xy10, xy20, last_series])
                 }
         return context
