@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='PyFlot',
-    version='1.0',
+    version='0.1',
     description='Python Interface for the known JavaScript Flot librabry',
     long_description=open('README.rst', 'r').read(),
     license='MIT',

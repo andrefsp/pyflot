@@ -7,7 +7,7 @@ except ImportError:
     import simplejson as json
 
 import flot
-
+from flot import exception
 
 class SampleObject(object):
     ""
@@ -101,6 +101,26 @@ class TimeVariableTest(unittest.TestCase):
 
 class SeriesTest(unittest.TestCase):
     "Series test class"
+
+    def test_cannot_initialize_empty_series(self):
+        try:
+            flot.Series(x=flot.XVariable(),
+                             y=flot.YVariable())
+        except exception.MissingDataException:
+            pass
+
+    def test_cannot_initialize_with_missing_axis(self):
+        try:
+            flot.Series(x=flot.XVariable(points=[1,2,3]))
+        except exception.MissingAxisException:
+            pass
+
+    def test_cannot_duplicate_axis(self):
+        try:
+            flot.Series(x=flot.XVariable(points=[1,2,3]),
+                    y=flot.XVariable(points=[4,5,6]))
+        except exception.MultipleAxisException:
+            pass
 
     def test_series_has_attrs(self):
         series = S1()

@@ -8,18 +8,23 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         xy10 = flot.Series(x=flot.XVariable(points=range(1, 10)),
                            y=flot.YVariable(points=range(1, 10)),
-                           options=flot.SeriesOptions(bars={'show': True}))
+                           options=flot.SeriesOptions(bars={'show': True},
+                                                      label='y = 10*x'))
 
         xy20 = flot.Series(x=flot.XVariable(points=[i for i in range(1, 10)]),
                            y=flot.YVariable(points=[i*2 for i in range(1, 10)]),
-                           options=flot.SeriesOptions(bars={'show': True}))
+                           options=flot.SeriesOptions(bars={'show': True},
+                                                    label='y = 20*x',
+                                                    color='green'))
 
         x_time_points = [datetime.date(2011, 1, i) for i in range(1, 20)]
         y_points = [float(1)/i for i in range(1, 20)]
         time1 = flot.Series(x=flot.TimeXVariable(points=x_time_points),
                             y=flot.YVariable(points=y_points),
                             options=flot.SeriesOptions(points={'show': True},
-                                                        lines={'show': True}))
+                                                        lines={'show': True},
+                                                        label='y = 1/x',
+                                                        color='blue'))
 
         graph_option = flot.GraphOptions(xaxis={'format': '%d/%m/%Y'})
         context = {

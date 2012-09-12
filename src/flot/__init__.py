@@ -1,3 +1,10 @@
+"""
+`PyFlot` is a Python interface for the known `Flot` Javascript chart library
+"""
+
+__version__ = "0.1"
+get_version = lambda : __version__
+
 import time
 try:
     import simplejson as json
@@ -68,7 +75,8 @@ class Variable(object):
 
     def contribute_to_class(self, obj, attr_name, data=None):
         if getattr(obj, self._var_name, False):
-            raise exception.MultipleAxisException
+            raise exception.MultipleAxisException(
+                                        "%s already set" % self._var_name)
         setattr(obj, self._var_name, self)
         if data:
             self._set_points(attr_name, data)
@@ -138,11 +146,28 @@ class Series(dict):
 
     _options = SeriesOptions()
 
+    def _set_data(self):
+        """
+        This method will be called to set Series data
+        """
+        for axis in ('_x', '_y'):
+            axis_obj = getattr(self, axis, False)
+            if not axis_obj:
+                raise exception.MissingAxisException("%s missing" % axis)
+            if not getattr(axis_obj, 'points', False):
+                raise exception.MissingDataException()
+
+        self['data'] = zip(self._x.points, self._y.points)
+
+
     def __init__(self, data=None, options=None, *args, **kwargs):
         """
         Series should be able to get contructed and completed through
         class definition or through kwargs
         """
+        self._options = SeriesOptions()
+        super(Series, self).__init__()
+
         if 'data' not in dir(self) and data is not None:
             # if not data is defined in Class def try to get is by args
             self.data = data
@@ -151,13 +176,16 @@ class Series(dict):
             attr = getattr(self, attr_name)
             if isinstance(attr, Variable):
                 attr.contribute_to_class(self, attr_name, self.data)
+
         # through kwargs
         for name, attr in kwargs.iteritems():
             if isinstance(attr, Variable):
                 attr.contribute_to_class(self, name)
-        self['data'] = zip(self._x.points, self._y.points)
+        
+        # set series data
+        self._set_data()
+
         # set series options
-        super(Series, self).__init__()
         for option in dir(self.Meta):
             self._options[option] = getattr(self.Meta, option)
         self.update(self._options)

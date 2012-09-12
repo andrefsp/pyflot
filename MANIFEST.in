@@ -1,3 +1,2 @@
-include README.rst
-include LICENSE
-recursive-include src/flot/templates *.html
+include LICENSE README.rst
+recursive-include flot/templates 
