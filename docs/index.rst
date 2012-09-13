@@ -6,6 +6,10 @@
 Welcome to PyFlot's documentation!
 ==================================
 
+PyFlot provides an interface from Python to flot_.
+
+.. _flot: http://www.flotcharts.org
+
 Contents:
 
 .. toctree::
