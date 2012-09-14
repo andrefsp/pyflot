@@ -2,8 +2,14 @@
 Introduction
 ============
 
-The idea behing pyflot its to provide a Python interface to the known Javascript flot_ chart library.
+Concept
+-------
 
-Not all Python developers are productive enough with Javascript to be able to create some fancy graph functionality. Pyflot tries to bring a nice and clean way to create graphs without knowing much about the final flot_ interface.
+Backend developers sometimes have to work with statistics and metrics and bring that data from a server to a web page in form of charts. 
 
-.. _flot: http://www.flotcharts.org/
+When this  situations happens developers most times find themselves thinking on things like, which data format should they push from the server to the pages, how to catch the data in the templates and how to plot the charts, sometimes situations even gets worst when in a team there is a clear lack of javascript skills to create those fancy graph pages.
+
+PyFlot_, appears as a shortcut and as a solution for all this providing a very nice a simple way to plot graphs just by modeling it in the backend.
+ 
+.. _PyFlot: http://pypi.python.org/pypi/PyFlot/
+

@@ -1,2 +1,3 @@
 include LICENSE README.rst
-recursive-include flot/templates 
+recursive-include docs *.html
+recursive-include flot/templates * 
