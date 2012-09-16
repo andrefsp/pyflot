@@ -2,8 +2,8 @@
 Introduction
 ============
 
-Concept
--------
+Motivation
+----------
 
 Backend developers sometimes have to work with statistics and metrics and bring that data from a server to a web page in form of charts. 
 
