@@ -10,6 +10,35 @@ PyFlot provides an interface from Python to flot_.
 
 .. _flot: http://www.flotcharts.org
 
+
+::
+     
+    import flot
+    class Fx(flot.Series):
+        data = [(1, 2), (2, 3), (3, 4), (4, 5)]
+     
+    class MyGraph(flot.Graph):
+        fx = Fx()
+     
+    my_graph = MyGraph()
+
+::
+    
+    <html>
+        <head>
+            <script type="text/javascript" src='static/js/jquery.js'></script>
+            <script type="text/javascript" src='static/js/jquery.flot.js'></script>
+        </head>
+        <body>
+            <div id="gr" style="width:600px;height:300px;"></div>
+        <script type='text/javascript'>
+            $.plot($("#gr"), {{ my_graph.json_data|safe }}, {{ my_graph.options|safe }});
+        </script>
+        </body>
+    </html>
+    
+
+
 Contents:
 
 .. toctree::
@@ -18,6 +47,7 @@ Contents:
    introduction 
    installation 
    usage
+   object-reference
    integrating-with-django
 
 
