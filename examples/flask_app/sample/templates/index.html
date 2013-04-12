@@ -1,0 +1,12 @@
+<html>
+    <head>
+        <script type="text/javascript" src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
+        <script type="text/javascript" src='http://cdnjs.cloudflare.com/ajax/libs/flot/0.7/jquery.flot.min.js'></script>
+    </head>
+    <body>
+        <div id="gr" style="width:600px;height:300px;"></div>
+    <script type='text/javascript'>
+        $.plot($("#gr"), {{ my_graph.json_data | safe }}, {{ my_graph.options | safe }});
+    </script>
+    </body>
+</html>
