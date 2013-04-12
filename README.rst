@@ -2,6 +2,8 @@
 pyflot
 ======
 
+Python Interface for the known JavaScript Flot librabry
+
 Motivation
 ==========
 
