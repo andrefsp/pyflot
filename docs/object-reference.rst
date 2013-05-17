@@ -17,7 +17,7 @@ Series
     
 
 - data
-    **data** argument can ben user to directly pass the data values to the Series.
+    **data** argument ca be used to directly pass the data values to the Series.
    
 ::
      
@@ -26,7 +26,7 @@ Series
     
 
 - xpoints, ypoints
-   **xpoints** and **ypoints** can be used to pass directly the points on the x and y axis
+   **xpoints** and **ypoints** can be used to pass directly the points on the x and y axis. Keep in mind that that they both need to be the same size.
 
 ::
     
@@ -41,7 +41,7 @@ Series
     
     import flot
     flot.Series(xpoints=range(0, 5), ypoints=range(0,5),
-                options=SeriesOptions(label='y=x', color='red'))
+                options=flot.SeriesOptions(label='y=x', color='red'))
     
 
 If the series is being created by class definition, the options are set by the series *Meta* class attribute.

@@ -237,7 +237,8 @@ class GraphTest(unittest.TestCase):
         self.assertTrue(my_graph._options['grid']['clickable'])
 
     def test_graph_accepts_options(self):
-        my_graph = flot.Graph(series1=S4(), options=flot.GraphOptions(xaxis={
+        my_graph = flot.Graph(series1=S4(),
+                options=flot.GraphOptions(xaxis={
                                                 'mode': 'time',
                                                 'format': '%d-%m-%y'
                                                 }))
