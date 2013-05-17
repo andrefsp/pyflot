@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='PyFlot',
     version='0.1',
@@ -9,7 +9,7 @@ setup(name='PyFlot',
     author_email='andrefsp@gmail.com',
     url='http://github.com/andrefsp/pyflot',
     packages=['flot', 'flot.templatetags'],
-    package_dir={'flot': 'src/flot'},
+    package_dir={'flot': 'flot'},
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
