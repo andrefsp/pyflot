@@ -7,7 +7,7 @@ Python Interface for the known JavaScript Flot librabry
 Build status
 ------------
 
-.. image:: https://secure.travis-ci.org/andrefsp/pyflot.png)
+.. image:: https://secure.travis-ci.org/andrefsp/pyflot.png
 
 
 Motivation
