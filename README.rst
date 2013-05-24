@@ -6,7 +6,9 @@ Python Interface for the known JavaScript Flot librabry
 
 Build status
 ------------
-[![Build Status](https://secure.travis-ci.org/andrefsp/pyflot.png)](http://travis-ci.org/andrefsp/pyflot)
+
+.. image:: https://secure.travis-ci.org/andrefsp/pyflot.png)
+
 
 Motivation
 ==========
