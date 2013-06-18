@@ -74,11 +74,13 @@ Assuming we have series such as:
 The series can be grouped on a Graph object by:
 
 ::
+    
     flot.Graph(series1=series_a, series2=series_b)
 
 or
 
 ::
+    
     flot.Graph([series_a, series_b])
 
 
