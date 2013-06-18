@@ -2,6 +2,9 @@
 pyflot
 ======
 
+.. image:: https://pypip.in/v/PyFlot/badge.png
+        :target: https://crate.io/packages/PyFlot
+
 .. image:: https://secure.travis-ci.org/andrefsp/pyflot.png
     :target: https://travis-ci.org/andrefsp/pyflot
 
