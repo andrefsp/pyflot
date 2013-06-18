@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='PyFlot',
-    version='0.1',
+    version='0.2',
     description='Python Interface the JavaScript Flot chart librabry',
     long_description=open('README.rst', 'r').read(),
     license='MIT',

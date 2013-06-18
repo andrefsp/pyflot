@@ -61,3 +61,29 @@ Graph
 -----
 
 This is a graph object
+The graph object its meant to group one or more series objects so that it can be displayed on the page.
+
+Assuming we have series such as:
+:: 
+
+    import flot
+    series_a = flot.Series(data=[(1, 1), (2, 2) , (3, 3), (4, 4)])
+    series_b = flot.Series(data=[(1, 2), (2, 3) , (3, 5), (4, 7)])
+  
+
+The series can be grouped on a Graph object by:
+
+::
+    flot.Graph(series1=series_a, series2=series_b)
+
+or
+
+::
+    flot.Graph([series_a, series_b])
+
+
+
+- options
+    **options** its what should be used to graph display costumization. ``GraphOptions`` object.
+
+
