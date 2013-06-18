@@ -5,7 +5,7 @@ pyflot
 .. image:: https://secure.travis-ci.org/andrefsp/pyflot.png
     :target: https://travis-ci.org/andrefsp/pyflot
 
-.. image:: ttps://coveralls.io/repos/andrefsp/pyflot/badge.png?branch=master
+.. image:: https://coveralls.io/repos/andrefsp/pyflot/badge.png?branch=master
     :target: https://coveralls.io/r/andrefsp/pyflot?branch=master
 
 
