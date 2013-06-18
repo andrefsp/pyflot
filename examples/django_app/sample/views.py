@@ -38,11 +38,14 @@ class HomeView(TemplateView):
         last_series = flot.Series(xpoints=range(0, 10), ypoints=range(0, 10),
                                     options=flot.SeriesOptions(label='y = x'))
 
+        inline_series = flot.Series(data=[(x*2, x) for x in range(0, 10)])
+
         context = {
                     'graph1': flot.Graph(series1=xy10, series2=xy20),
                     'graph2': flot.Graph(series1=time1, options=graph_option),
                     'sin_graph': flot.Graph(sin_series=sin_series),
                     'last_series': flot.Graph(last_series=last_series),
-                    'all_series_graph': flot.Graph([xy10, xy20, last_series])
+                    'all_series_graph': flot.Graph([xy10, xy20, last_series]),
+                    'inline_series': flot.Graph([inline_series,])
                 }
         return context

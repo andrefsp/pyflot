@@ -13,14 +13,19 @@
         </script>
         <!-- graphs plotted with template tag -->
         <hr/>
-        {% plot gr1 graph1 style="width:900px;height:200px" class="myclass" %} 
+        {% plot graph1 style="width:900px;height:200px" class="myclass" %} 
         <hr/>
-        {% plot gr2 graph2 style="width:900px;height:200px" %} 
+        {% plot graph2 style="width:900px;height:200px" id="k1" %} 
         <hr/>
-        {% plot sin sin_graph  style="width:900px;height:200px" %}
+        {% plot sin_graph style="width:900px;height:200px" %}
         <hr/>
-        {% plot ls last_series  style="width:900px;height:200px" %}
+        {% plot last_series style="width:900px;height:200px" %}
         <hr/>
-        {% plot asg all_series_graph  style="width:900px;height:200px" %}
+        {% plot all_series_graph style="width:900px;height:200px" %}
+        <hr/>
+        {% plot inline_series style="width:900px;height:200px" %}
+
+        {% plot inline_series style="width:900px;height:200px" %}
+         
     </body>
 </html>
